@@ -54,30 +54,34 @@ router.get('/:id', (req, res) => {
 router.post('/', (req, res) => {
   // create a new category
   Category.create({
-    Category_name: req.body.Category_name
+    category_name: req.body.category_name,
   })
-    .then(dbCatdata => res.json(dbCatdata))
+    .then(dbCategorydata => res.json(dbCategorydata))
     .catch(err => {
       console.log(err);
-      res.status(500).json(err);
+      res.status(400).json(err);
     });
 });
 
+// Update a category by ID
 router.put('/:id', (req, res) => {
-  // update a category by its `id` value
-  Category.update(req.body, {
-    where: {
-      id: req.params.id
+  Category.update(
+    {
+      category_name: req.body.category_name, // Update this field
+    },
+    {
+      where: {
+        id: req.params.id, // Specify the category ID
+      },
     }
-  })
-    .then(dbCatdata => {
-      if (!dbCatdata) {
-        res.status(404).json({ message: 'no category found with this id' });
-        return;
+  )
+    .then((affectedRows) => {
+      if (affectedRows[0] === 0) {
+        return res.status(404).json({ message: 'No category found with this id' });
       }
-      res.json(dbCatdata);
+      res.json({ message: 'Category updated successfully' });
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err);
       res.status(500).json(err);
     });
